@@ -6,10 +6,10 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         in_memory: { memory: null }
-        in_database:
+        users_in_database:
             entity:
                 class: App\Entity\User
-                property: username
+                property: email
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -17,7 +17,7 @@ security:
         main:
             anonymous: true
             
-            provider: in_database
+            provider: users_in_database
             form_login:
                 check_path: account_login
                 login_path: account_login
