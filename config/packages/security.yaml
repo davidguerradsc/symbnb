@@ -6,7 +6,7 @@ security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         in_memory: { memory: null }
-        users_in_database:
+        in_database:
             entity:
                 class: App\Entity\User
                 property: email
@@ -17,10 +17,11 @@ security:
         main:
             anonymous: true
             
-            provider: users_in_database
+            provider: in_database
+
             form_login:
-                check_path: account_login
                 login_path: account_login
+                check_path: account_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
