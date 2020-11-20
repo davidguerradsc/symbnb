@@ -3,16 +3,14 @@
 namespace App\Entity;
 
 use Cocur\Slugify\Slugify;
-use App\Repository\AdRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
- * @ORM\Entity(repositoryClass=AdRepository::class)
+ * @ORM\Entity(repositoryClass="App\Repository\AdRepository")
  * @ORM\HasLifecycleCallbacks
  * @UniqueEntity(
  * 	fields={"title"},
@@ -28,10 +26,10 @@ class Ad
      */
     private $id;
 
-	/**
-	 * @ORM\Column(type="string", length=255)
-	 * @Assert\Length(min=10, max=255, minMessage="Le titre doit faire plus de 10 caractères !", maxMessage="Le titre ne doit pas faire plus de 255 caractères !")
-	 */
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @Assert\Length(min=10, max=255, minMessage="Le titre doit faire plus de 10 caractères !", maxMessage="Le titre ne doit pas faire plus de 255 caractères !")
+     */
     private $title;
 
     /**
@@ -46,32 +44,38 @@ class Ad
 
     /**
      * @ORM\Column(type="text")
-	 * @Assert\Length(min=20, minMessage="Votre introduction doit faire plus de 20 caractères")
+     * @Assert\Length(min=20, minMessage="Votre introduction doit faire plus de 20 caractères")
      */
     private $introduction;
 
-	/**
-	 * @ORM\Column(type="text")
-	 * @Assert\Length(min=100, minMessage="Votre introduction doit faire plus de 100 caractères")
-	 */
+    /**
+     * @ORM\Column(type="text")
+     * @Assert\Length(min=100, minMessage="Votre introduction doit faire plus de 100 caractères")
+     */
     private $content;
 
     /**
      * @ORM\Column(type="string", length=255)
-	 * @Assert\Url()
+     * @Assert\Url()
      */
     private $coverImage;
 
     /**
      * @ORM\Column(type="integer")
      */
-	private $rooms;
+    private $rooms;
 
     /**
      * @ORM\OneToMany(targetEntity=Image::class, mappedBy="ad", orphanRemoval=true)
-	 * @Assert\Valid()
+     * @Assert\Valid()
      */
     private $images;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="ads")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $author;
 
     public function __construct()
     {
@@ -79,20 +83,21 @@ class Ad
     }
 
 
-	/**
-	 * Permet d'initialiser le slug
-	 * 
-	 * @ORM\PrePersist
-	 * @ORM\PreUpdate
-	 * 
-	 * @return void
-	 */
-	public function initializeSlug() {
-                        		if(empty($this->slug)){
-                        			$slugify = new Slugify();
-                        			$this->slug = $slugify->slugify($this->title);
-                        		}
-                        	}
+    /**
+     * Permet d'initialiser le slug
+     * 
+     * @ORM\PrePersist
+     * @ORM\PreUpdate
+     * 
+     * @return void
+     */
+    public function initializeSlug()
+    {
+        if (empty($this->slug)) {
+            $slugify = new Slugify();
+            $this->slug = $slugify->slugify($this->title);
+        }
+    }
 
     public function getId(): ?int
     {
@@ -209,6 +214,18 @@ class Ad
                 $image->setAd(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?User $author): self
+    {
+        $this->author = $author;
 
         return $this;
     }
